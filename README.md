@@ -5,7 +5,7 @@
 # 1. DWA란?
 
 DWA는 Dynamic window approach의 약자로 경로 판단 알고리즘이다. 로봇의 좌표, 센서로부터 얻는 장애물과의 거리를 토대로 최적의 선속도와 각속도를 도출해내어 장애물을 회피하며 목적지로 도달하는 알고리즘이다.
-![DWA-method-DWA-dynamic-window-approach](./doc/DWA-method-DWA-dynamic-window-approach.png) 
+![DWA-method-DWA-dynamic-window-approach](./DWA-method-DWA-dynamic-window-approach.png) 
 
 
 
