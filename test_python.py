@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import numpy as np
+import math
 
 
 
@@ -20,8 +21,13 @@ step_distance = np.concatenate((zero_dis_step, rad_dis_step), axis=2) + 0.3
 
 angle160 = np.arange(-80, 80).reshape(160, 1, 1, 1)
 scan_range = np.full((1, ), 0)
+step_angle_160 = np.int32(np.rint(angle160 + np.degrees(-1 * step * radps_ar / 2) + np.degrees(-1 * radps_ar)))
 
+theta = np.radians(angle160)
+x = np.sin(theta)
+y =np.array([[0],[0]])
+z = np.zeros((2, 6))
+print(z)
 
-print(angle160)
 
 
