@@ -19,44 +19,36 @@ goal_distance = 0
 current_speed = 0
 turn_speed = 0
 angle_of_turn = 0
+step = 0.15 * np.arange(1, 11).reshape(10, 1, 1)
+
+mps_ar = np.array(mps).reshape(mps_n, 1)
+radps_ar = np.array(radps)
+nozero_ar = np.delete(np.array(radps), 0)
+zero_dis_step = mps_ar * step
+rad_dis_step = 2 * np.sin(step * abs(nozero_ar) / 2) * (mps_ar / abs(nozero_ar)) 
+step_distance = np.concatenate((zero_dis_step, rad_dis_step), axis=2) + 0.3
+#print(step_distance)
 
 
-angle_160 = np.array(-80, 80).reshape(160,1,1,1)
+angle_160 = np.arange(-80, 80).reshape(160,1,1,1)
+step_angle_160 = np.int32(np.rint(angle_160 + np.degrees(-1 * step * radps_ar / 2) + np.degrees(-1 * radps_ar)))
+print(angle_160[:,0][:,0])
+#print(np.shape(step_angle_160))
+#print(step_angle_160)
+scan_range = np.full((1, ), 0) 
+#scan_distance = scan_range[np.deg2rad(angle_160)]
+
+#print(scan_range)
+#scan_distance = scan_range[angle_160]
+#theta = np.radians(angle_160)
+#o2r_dis = np.hypot(step_distance * abs(np.sin(theta)), scan_distance - step_distance * np.cos(theta))
+#o2r_dis_min = np.amin(o2r_dis, axis=0)
+#obstacle_dis = o2r_dis_min[0]
 
 
 
 
-class SelfDrive:
-    def __init__(self, publisher):
-        self.publisher = publisher
-        
-    def lds_callbasck(self, scan):
-        turtle_vel = Twist()
-        scan_range = np.array(scan.range)
-        global dwa_mode
-        global sub_mode
-        turtle_vel = Twist()
-        scan_range = np.array(scan.range)
-        x = turtle_vel.linear.x
-        z = turtle_vel.angular.z
-        if sub_mode == "stop":
-            x = 0.0
-            z = 0.0
 
-
-    
-
-def obstacle_collision_fun():
-    global goal_distance
-    global current_speed
-    global turn_speed
-    global angle_of_turn
-    if turn_speed == 0:
-        return goal_distance / current_speed
-    else:
-        return angle_of_turn / turn_speed
-def time_to_stop():
-    
 
 
     

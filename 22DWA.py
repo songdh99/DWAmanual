@@ -26,6 +26,8 @@ class SelfDrive:
         self.lidar_array = np.array([])
         self.mps = [0.2, 0.17, 0.15, 0.13, 0.1]
         self.radps = [0, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, -0.3, -0.5, -0.6, -0.7, -0.8, -0.9]
+        self.radps_ar = np.array(self.radps)
+        self.step = 0.15 * np.arange(1, 11).reshape(10, 1, 1)
         self.t_array = 0.25 * np.arange(1, 11).reshape(10, 1, 1)
         self.best_score = None
         self.radps_array = None
@@ -37,6 +39,11 @@ class SelfDrive:
         self.goal_y = 0.317
         self.save_x = -1.979
         self.save_y = 0.0
+        self.angle_160 = np.arange(-80, 80).reshape(160, 1, 1, 1)
+        self.step_angle_160 = np.int32(np.rint(self.angle_160 + np.degrees(-1 * self.step * self.radps_ar / 2) + np.degrees(-1 * self.radps_ar)))
+
+        self.scan_range = np.full((1, ), 0) 
+
 
     def current_pose(self, data):
         self.global_pose.x = data.position.x
@@ -46,7 +53,7 @@ class SelfDrive:
     def lds_callback(self, scan):
         turtle_vel = Twist()
         self.remaining_scoring()
-        Scan_ran = np.array(scan.range)
+        self.scan_range = np.array(scan.range)
         turtle_vel.linear.x, turtle_vel.angular.z = self.obstacle_scoring()
         if np.hypot(self.goal_x - self.global_pose.x, self.goal_y - self.global_pose.y) <= 0.10:
             rospy.loginfo_once("done")
@@ -56,8 +63,8 @@ class SelfDrive:
     def calculation(self):
         mps_array = np.array(self.mps).reshape(len(self.mps), 1)
         self.radps_array = np.delete(np.array(self.radps), 0)
-        line_motion = mps_array * self.t_array
-        rotational_motion = 2 * (mps_array / self.radps_array ) * np.sin(0.5 * self.radps_array * self.t_array) + 0.05
+        line_motion = mps_array * self.t_array      #선운동
+        rotational_motion = 2 * (mps_array / self.radps_array ) * np.sin(0.5 * self.radps_array * self.t_array) + 0.05      #회전운동
         self.motion = np.concatenate((line_motion, rotational_motion), axis=2) + 0.4
         local_x_pos = np.concatenate((line_motion, rotational_motion * np.cos(0.5 * self.radps_array * self.t_array)), axis=2)
         local_y_pos = np.concatenate((np.zeros((10, len(self.mps), 1)), rotational_motion * np.sin(0.5 * self.radps_array * self.t_array)), axis=2)
@@ -74,8 +81,13 @@ class SelfDrive:
         self.best_score = np.unravel_index(np.argmin(score[3], axis=None), score[3].shape)
 
     def obstacle_scoring(self):
+        self.scan_distance = self.scan_range[self.step_angle_160]
+        self.theta = np.radians(self.angle_160)
+        self.o2r_dis = np.hypot(self.step_distance * abs(np.sin(self.theta)), self.scan_distance - self.step_distance * np.cos(self.theta))
+        self.o2r_dis_min = np.amin(self.o2r_dis, axis=0)
+        obstacle_dis = self.o2r_dis_min[0]
         
-        
+                
         if True in back:
             rospy.loginfo("back")
             return -0.2, self.radps[self.best_score[1]]
