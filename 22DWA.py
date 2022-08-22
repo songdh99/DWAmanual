@@ -39,7 +39,7 @@ class SelfDrive:
         self.goal_y = 0.317
         self.save_x = -1.979
         self.save_y = 0.0
-        self.angle_160 = np.arange(-80, 80).reshape(160, 1, 1, 1)
+        self.angle_160 = np.arange(-80, 81).reshape(40,4)
         self.step_angle_160 = np.int32(np.rint(self.angle_160 + np.degrees(-1 * self.step * self.radps_ar / 2) + np.degrees(-1 * self.radps_ar)))
 
         self.scan_range = np.full((1, ), 0) 
@@ -81,13 +81,37 @@ class SelfDrive:
         self.best_score = np.unravel_index(np.argmin(score[3], axis=None), score[3].shape)
 
     def obstacle_scoring(self):
-        self.scan_distance = self.scan_range[self.step_angle_160]
-        self.theta = np.radians(self.angle_160)
-        self.o2r_dis = np.hypot(self.step_distance * abs(np.sin(self.theta)), self.scan_distance - self.step_distance * np.cos(self.theta))
-        self.o2r_dis_min = np.amin(self.o2r_dis, axis=0)
-        obstacle_dis = self.o2r_dis_min[0]
+        self.scan_distance = np.nonzero(self.scan_range[self.angle_160])
+        # self.theta = np.radians(self.angle_160)
+        # self.o2r_dis = np.hypot(self.step_distance * abs(np.sin(self.theta)), self.scan_distance - self.step_distance * np.cos(self.theta))
+        # self.o2r_dis_min = np.amin(self.o2r_dis, axis=0)
+        # obstacle_dis = self.o2r_dis_min[0]
+        ran_index = np.random.randint(0, 40, size = 20)
+        right = self.scan_distance[0 ,:]            #right
+        front_right = self.scan_distance[1 ,:]      #front_right
+        front_left = self.scan_distance[2 ,:]       #front_left
+        left = self.scan_distance[3 ,:]             #left
+
+        back = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
+                              np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
+                              np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
+                              np.logical_and(left[ran_index] >= 0.2, left[ran_index] < 0.55))
+        side_left = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
+                                   np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
+                                   np.logical_or(front_left[ran_index] > front_right[ran_index]))
+        side_right = np.logical_and(np.logical_and(left[ran_index] >= 0,2, np.left[ran_index] < 0.55),
+                                    np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
+                                    np.logical_or(front_right[ran_index] > front_left[ran_index]))
         
-                
+
+        # back = np.logical_and(np.logical_and(self.right[ran_index] >= 0.2, self.scan_distance[0 ,:] < 0.55),
+        #                     np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
+        #                     np.logical_and(self.scan_distance[2 ,:] >= 0.2, self.scan_distance[2 ,:] < 0.55),
+        #                     np.logical_and(self.scan_distance[3 ,:] >= 0.2, self.scan_distance[3 ,:] < 0.55))
+        # side_left = np.logical_and(np.logical_and(self.scan_distance[0, :] >= 0.2, self.scan_distance[0 ,:] < 0.55),
+        #                         np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
+        #                         np.logical_or(self.scan_distance[2 ,:] > self.scan_distance[2 ,:]))
+        # side_right = np.logical_and(np.logical_and(self.scan_distance[: ,0]))
         if True in back:
             rospy.loginfo("back")
             return -0.2, self.radps[self.best_score[1]]

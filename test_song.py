@@ -3,10 +3,7 @@
 from multiprocessing import current_process
 import turtle
 import numpy as np
-import rospy
-from std_msgs.msg import Int32, Float32, Bool, String
-from geometry_msgs.msg import Twist, Pose
-from sensor_msgs.msg import LaserScan
+
 dwa_mode = "wait"
 sub_mode = "foward_goal"
 mps_n = 2
@@ -30,14 +27,21 @@ step_distance = np.concatenate((zero_dis_step, rad_dis_step), axis=2) + 0.3
 #print(step_distance)
 
 
-angle_160 = np.arange(-80, 80).reshape(160,1,1,1)
-step_angle_160 = np.int32(np.rint(angle_160 + np.degrees(-1 * step * radps_ar / 2) + np.degrees(-1 * radps_ar)))
-print(angle_160[:,0][:,0])
+
+angle_160 = np.arange(-80, 80).reshape(4, 40)
+#step_angle_160 = np.int32(np.rint(angle_160 + np.degrees(-1 * step * radps_ar / 2) + np.degrees(-1 * radps_ar)))
+
 #print(np.shape(step_angle_160))
 #print(step_angle_160)
 scan_range = np.full((1, ), 0) 
 #scan_distance = scan_range[np.deg2rad(angle_160)]
+data0 = np.random.randint(0, 40, size = 20)
 
+
+data0 = np.random.randint(0, 40, size = 20)
+test1 = angle_160[0 ,:][data0]
+test2 = test1[data0]
+print(test1)
 #print(scan_range)
 #scan_distance = scan_range[angle_160]
 #theta = np.radians(angle_160)
