@@ -39,7 +39,7 @@ class SelfDrive:
         self.goal_y = 0.317
         self.save_x = -1.979
         self.save_y = 0.0
-        self.angle_160 = np.arange(-80, 81).reshape(40,4)
+        self.angle_160 = np.arange(-80, 81).reshape(4, 40)
         self.step_angle_160 = np.int32(np.rint(self.angle_160 + np.degrees(-1 * self.step * self.radps_ar / 2) + np.degrees(-1 * self.radps_ar)))
 
         self.scan_range = np.full((1, ), 0) 
