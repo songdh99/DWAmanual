@@ -86,45 +86,50 @@ class SelfDrive:
         # self.o2r_dis = np.hypot(self.step_distance * abs(np.sin(self.theta)), self.scan_distance - self.step_distance * np.cos(self.theta))
         # self.o2r_dis_min = np.amin(self.o2r_dis, axis=0)
         # obstacle_dis = self.o2r_dis_min[0]
-        ran_index = np.random.randint(0, 40, size = 20)
-        right = self.scan_distance[0 ,:]            #right
-        front_right = self.scan_distance[1 ,:]      #front_right
-        front_left = self.scan_distance[2 ,:]       #front_left
-        left = self.scan_distance[3 ,:]             #left
+        # ran_index = np.random.randint(0, 40, size = 20)
+        # right = self.scan_distance[0 ,:]            #right
+        # front_right = self.scan_distance[1 ,:]      #front_right
+        # front_left = self.scan_distance[2 ,:]       #front_left
+        # left = self.scan_distance[3 ,:]             #left
 
-        back = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
-                              np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
-                              np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
-                              np.logical_and(left[ran_index] >= 0.2, left[ran_index] < 0.55))
-        side_left = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
-                                   np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
-                                   np.logical_or(front_left[ran_index] > front_right[ran_index]))
-        side_right = np.logical_and(np.logical_and(left[ran_index] >= 0,2, np.left[ran_index] < 0.55),
-                                    np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
-                                    np.logical_or(front_right[ran_index] > front_left[ran_index]))
+        # back = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
+        #                       np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
+        #                       np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
+        #                       np.logical_and(left[ran_index] >= 0.2, left[ran_index] < 0.55))
+        # side_left = np.logical_and(np.logical_and(right[ran_index] >= 0.2, right[ran_index] < 0.55),
+        #                            np.logical_and(front_right[ran_index] >= 0.2, front_right[ran_index] < 0.55),
+        #                            np.logical_or(front_left[ran_index] > front_right[ran_index]))
+        # side_right = np.logical_and(np.logical_and(left[ran_index] >= 0,2, np.left[ran_index] < 0.55),
+        #                             np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
+        #                             np.logical_or(front_right[ran_index] > front_left[ran_index]))
         
 
-        # back = np.logical_and(np.logical_and(self.right[ran_index] >= 0.2, self.scan_distance[0 ,:] < 0.55),
-        #                     np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
-        #                     np.logical_and(self.scan_distance[2 ,:] >= 0.2, self.scan_distance[2 ,:] < 0.55),
-        #                     np.logical_and(self.scan_distance[3 ,:] >= 0.2, self.scan_distance[3 ,:] < 0.55))
-        # side_left = np.logical_and(np.logical_and(self.scan_distance[0, :] >= 0.2, self.scan_distance[0 ,:] < 0.55),
-        #                         np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
-        #                         np.logical_or(self.scan_distance[2 ,:] > self.scan_distance[2 ,:]))
-        # side_right = np.logical_and(np.logical_and(self.scan_distance[: ,0]))
+        back = np.logical_and(np.logical_and(self.scan_distance[0:3 ,:] >= 0.2, self.scan_distance[0:3 ,:] < 0.55))
+        side_left = np.logical_and(np.logical_and(self.scan_distance[0, :] >= 0.2, self.scan_distance[0 ,:] < 0.55),
+                                    np.logical_and(self.scan_distance[2 ,:] > self.scan_distance[1 ,:]), True)
+        side_left2 = np.logical_and(np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
+                                    np.logical_or(self.scan_distance[2 ,:] > self.scan_distance[1 ,:]), True)
+        side_right = np.logical_and(np.logical_and(self.scan_distance[3 ,:] >= 0,2, self.scan_distance[3 ,:] < 0.55),
+                                    np.logical_or(self.scan_distance[2 ,:] < self.scan_distance[1 ,:]))
+        side_right2 = np.logical_and(np.logical_and(self.scan_distance[2 ,:] >= 0,2, self.scan_distance[2 ,:] < 0.55),
+                                    np.logical_or(self.scan_distance[2 ,:] < self.scan_distance[1 ,:]))                            
+
         if True in back:
             rospy.loginfo("back")
             return -0.2, self.radps[self.best_score[1]]
         elif True in side_left and True in side_right:
             rospy.loginfo("side back")
             return -0.2, 0.
-        elif True in side_left: # 우회전
+        elif True in side_left or True in side_left2: # 우회전
             rospy.loginfo("side left")
+            rospy.loginfo("mps = ", self.mps[self.best_score[0]])
             return self.mps[self.best_score[0]], -0.15
-        elif True in side_right: # 좌회전
+        elif True in side_right or True in side_right2: # 좌회전
             rospy.loginfo("side right")
+            rospy.loginfo("mps = ", self.mps[self.best_score[0]])
             return self.mps[self.best_score[0]], 0.15
         rospy.loginfo("straight")
+        rospy.loginfo("mps = ", self.mps[self.best_score[0]], "radps = ", self.radps[self.best_score[1]])
         return self.mps[self.best_score[0]], self.radps[self.best_score[1]]
 
 
