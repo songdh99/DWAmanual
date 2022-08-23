@@ -104,16 +104,12 @@ class SelfDrive:
         #                             np.logical_and(front_left[ran_index] >= 0.2, front_left[ran_index] < 0.55),
         #                             np.logical_or(front_right[ran_index] > front_left[ran_index]))
         
-
-        back = 0.55 > np.mean(self.scan_distance[0:3 ,:]) >= 0.1
-        side_left = np.logical_and(0.55 > np.mean(self.scan_distance[0, :]) >= 0.2,
-                                    self.scan_distance[2 ,:] > self.scan_distance[1 ,:])
-        side_left2 = np.logical_and(np.logical_and(np.mean(self.scan_distance[1 ,:]) >= 0.2, np.mean(self.scan_distance[1 ,:]) < 0.55),
-                                    self.scan_distance[2 ,:] > self.scan_distance[1 ,:])
-        side_right = np.logical_and(0.55 > np.mean(self.scan_distance[3 ,:]) >= 0,2, 
-                                    self.scan_distance[2 ,:] < self.scan_distance[1 ,:])
-        side_right2 = np.logical_and(0.55 > np.mean(self.scan_distance[2 ,:]) >= 0,2,
-                                    self.scan_distance[2 ,:] < self.scan_distance[1 ,:])                            
+        data = np.mean(self.scan_distance, axis = 1)
+        back = 0.55 > np.mean(data) >= 0.1
+        side_left = np.logical_and(0.55 > data[0] >= 0.2, data[2] > data[1])
+        side_left2 = np.logical_and( 0.55 > data[1] >= 0.2, data[2] > data[1])
+        side_right = np.logical_and(0.55 > data[3] >= 0,2, data[2] < data[1])
+        side_right2 = np.logical_and(0.55 > data[2] >= 0,2, data[2] < data[1])                            
 
         if True in back:           
             rospy.loginfo("back")
