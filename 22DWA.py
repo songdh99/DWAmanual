@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+#!/home/pi/.pyenv/versions/rospy3/bin/python
 # -- coding: utf-8 --
 
 import numpy as np
 import rospy
-import tf
+#import tf
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist, Pose, Pose2D
 
@@ -104,17 +105,17 @@ class SelfDrive:
         #                             np.logical_or(front_right[ran_index] > front_left[ran_index]))
         
 
-        back = np.logical_and(np.logical_and(np.mean(self.scan_distance[0:3 ,:]) >= 0.2, np.mean(self.scan_distance[0:3 ,:] < 0.55)))
-        side_left = np.logical_and(np.logical_and(np.mean(self.scan_distance[0, :]) >= 0.2, np.mean(self.scan_distance[0 ,:]) < 0.55),
-                                    np.logical_and(np.mean(self.scan_distance[2 ,:]) > np.mean(self.scan_distance[1 ,:])), True)
+        back = 0.55 > np.mean(self.scan_distance[0:3 ,:]) >= 0.1
+        side_left = np.logical_and(0.55 > np.mean(self.scan_distance[0, :]) >= 0.2,
+                                    self.scan_distance[2 ,:] > self.scan_distance[1 ,:])
         side_left2 = np.logical_and(np.logical_and(np.mean(self.scan_distance[1 ,:]) >= 0.2, np.mean(self.scan_distance[1 ,:]) < 0.55),
-                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) > np.mean(self.scan_distance[1 ,:])), True)
-        side_right = np.logical_and(np.logical_and(np.mean(self.scan_distance[3 ,:]) >= 0,2, np.mean(self.scan_distance[3 ,:]) < 0.55),
-                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) < np.mean(self.scan_distance[1 ,:])))
-        side_right2 = np.logical_and(np.logical_and(np.mean(self.scan_distance[2 ,:]) >= 0,2, np.mean(self.scan_distance[2 ,:]) < 0.55),
-                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) < np.mean(self.scan_distance[1 ,:])))                            
+                                    self.scan_distance[2 ,:] > self.scan_distance[1 ,:])
+        side_right = np.logical_and(0.55 > np.mean(self.scan_distance[3 ,:]) >= 0,2, 
+                                    self.scan_distance[2 ,:] < self.scan_distance[1 ,:])
+        side_right2 = np.logical_and(0.55 > np.mean(self.scan_distance[2 ,:]) >= 0,2,
+                                    self.scan_distance[2 ,:] < self.scan_distance[1 ,:])                            
 
-        if True in back:            #back
+        if True in back:           
             rospy.loginfo("back")
             return -0.2, self.radps[self.best_score[1]]
         elif True in side_left and True in side_right:
@@ -122,14 +123,11 @@ class SelfDrive:
             return -0.2, 0.
         elif True in side_left or True in side_left2: # 우회전
             rospy.loginfo("side left")
-            rospy.loginfo("mps = ", self.mps[self.best_score[0]])
             return self.mps[self.best_score[0]], -0.15
         elif True in side_right or True in side_right2: # 좌회전
             rospy.loginfo("side right")
-            rospy.loginfo("mps = ", self.mps[self.best_score[0]])
             return self.mps[self.best_score[0]], 0.15
         rospy.loginfo("straight")
-        rospy.loginfo("mps = ", self.mps[self.best_score[0]], "radps = ", self.radps[self.best_score[1]])
         return self.mps[self.best_score[0]], self.radps[self.best_score[1]]
 
 
