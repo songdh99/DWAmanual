@@ -104,17 +104,17 @@ class SelfDrive:
         #                             np.logical_or(front_right[ran_index] > front_left[ran_index]))
         
 
-        back = np.logical_and(np.logical_and(self.scan_distance[0:3 ,:] >= 0.2, self.scan_distance[0:3 ,:] < 0.55))
-        side_left = np.logical_and(np.logical_and(self.scan_distance[0, :] >= 0.2, self.scan_distance[0 ,:] < 0.55),
-                                    np.logical_and(self.scan_distance[2 ,:] > self.scan_distance[1 ,:]), True)
-        side_left2 = np.logical_and(np.logical_and(self.scan_distance[1 ,:] >= 0.2, self.scan_distance[1 ,:] < 0.55),
-                                    np.logical_or(self.scan_distance[2 ,:] > self.scan_distance[1 ,:]), True)
-        side_right = np.logical_and(np.logical_and(self.scan_distance[3 ,:] >= 0,2, self.scan_distance[3 ,:] < 0.55),
-                                    np.logical_or(self.scan_distance[2 ,:] < self.scan_distance[1 ,:]))
-        side_right2 = np.logical_and(np.logical_and(self.scan_distance[2 ,:] >= 0,2, self.scan_distance[2 ,:] < 0.55),
-                                    np.logical_or(self.scan_distance[2 ,:] < self.scan_distance[1 ,:]))                            
+        back = np.logical_and(np.logical_and(np.mean(self.scan_distance[0:3 ,:]) >= 0.2, np.mean(self.scan_distance[0:3 ,:] < 0.55)))
+        side_left = np.logical_and(np.logical_and(np.mean(self.scan_distance[0, :]) >= 0.2, np.mean(self.scan_distance[0 ,:]) < 0.55),
+                                    np.logical_and(np.mean(self.scan_distance[2 ,:]) > np.mean(self.scan_distance[1 ,:])), True)
+        side_left2 = np.logical_and(np.logical_and(np.mean(self.scan_distance[1 ,:]) >= 0.2, np.mean(self.scan_distance[1 ,:]) < 0.55),
+                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) > np.mean(self.scan_distance[1 ,:])), True)
+        side_right = np.logical_and(np.logical_and(np.mean(self.scan_distance[3 ,:]) >= 0,2, np.mean(self.scan_distance[3 ,:]) < 0.55),
+                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) < np.mean(self.scan_distance[1 ,:])))
+        side_right2 = np.logical_and(np.logical_and(np.mean(self.scan_distance[2 ,:]) >= 0,2, np.mean(self.scan_distance[2 ,:]) < 0.55),
+                                    np.logical_or(np.mean(self.scan_distance[2 ,:]) < np.mean(self.scan_distance[1 ,:])))                            
 
-        if True in back:
+        if True in back:            #back
             rospy.loginfo("back")
             return -0.2, self.radps[self.best_score[1]]
         elif True in side_left and True in side_right:
