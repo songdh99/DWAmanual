@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/home/pi/.pyenv/versions/rospy3/bin/python
+
 import rospy
 from geometry_msgs.msg import Pose
 import math
@@ -7,7 +8,7 @@ import tf
 def main():
 	rospy.init_node('send_current_xyz')
 	listener = tf.TransformListener()
-	pub = rospy.Publisher('current_xyz', Pose, queue_size=1)
+	pub = rospy.Publisher('current_pose', Pose, queue_size=1)
 	pub2 = rospy.Publisher('current_angle', Pose, queue_size=1)
 	rate = rospy.Rate(1)
 
